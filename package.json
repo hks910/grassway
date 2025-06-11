@@ -1,0 +1,17 @@
+{
+  "name": "grassway",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "axios": "^0.x.x",
+    "dotenv": "^10.x.x",
+    "ejs": "^3.x.x",
+    "express": "^4.x.x",
+    "mysql2": "^2.x.x",
+    "sequelize": "^6.x.x"
+  }
+}
