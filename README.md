@@ -7,7 +7,7 @@
 
 [![Lisensi: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node.js-v16.x-green.svg)](https://nodejs.org/en/)
-[![Kontribusi Welcome](https://img.shields.io/badge/Contributions-welcome-brightgreen.svg?style=flat)](./CONTRIBUTING.md)
+
 
 Sebuah proyek dari tim **Grasshopper**, **Grass-Way** adalah REST API berbasis Node.js + Express yang dirancang untuk memonitor dan memprediksi pertumbuhan rumput di berbagai segmen lahan. Sistem ini mengintegrasikan data tanah, cuaca dari BMKG, dan model pertumbuhan untuk memberikan estimasi ketinggian rumput yang akurat.
 
