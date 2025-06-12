@@ -1,20 +1,40 @@
 const segmentService = require('../services/segmentService');
+const db = require('../models/db');
+
 
 // Controller untuk update tinggi segment
-const updateSegmentHeight = async (req, res) => {
-  const { segmentId } = req.body;
+let lastUpdateTime = null;
+
+const updateAllSegmentHeights = async (req, res) => {
+  const now = new Date();
+if (lastUpdateTime && now - lastUpdateTime < 24 * 60 * 60 * 1000) {
+  const nextAllowed = new Date(lastUpdateTime.getTime() + 24 * 60 * 60 * 1000);
+  return res.status(429).json({ message: 'Update allowed only once per day', nextAllowed });
+}
+
+
   try {
-    const rows = await segmentService.updateSegmentHeightById(segmentId);
-    if (rows > 0) {
-      return res.status(200).json({ message: "Segment height updated successfully" });
+    const [segments] = await db.query(`SELECT id FROM segment`);
+    const result = [];
+
+    for (const seg of segments) {
+      try {
+        const rows = await segmentService.updateSegmentHeightById(seg.id);
+        result.push({ segmentId: seg.id, status: rows > 0 ? 'updated' : 'not found' });
+      } catch (err) {
+        result.push({ segmentId: seg.id, error: err.message });
+      }
     }
-    return res.status(404).json({ message: "Segment not found" });
+
+    lastUpdateTime = now;
+    res.status(200).json({ message: 'Height updated', result });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Error updating segment height", error: err.message });
+    res.status(500).json({ message: 'Internal error', error: err.message });
   }
 };
 
+
 module.exports = {
-  updateSegmentHeight
+  updateAllSegmentHeights
 };

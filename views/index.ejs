@@ -1,314 +1,594 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dasbor Pertumbuhan Rumput Tol</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Custom styles to complement Tailwind */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7fafc; /* Lighter gray background */
-        }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-        /* Custom class for card selection highlight */
-        .selected-card {
-            border-color: #2563eb; /* Blue-600 */
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Pemantauan Rumput Jalan Tol</title>
+  
+  <!-- Google Fonts for better typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #005A8D;
+      --secondary-color: #00A8E8;
+      --bg-color: #f4f7fa;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --text-muted: #777;
+      --border-color: #e0e0e0;
+      --status-safe: #4CAF50;
+      --status-warning: #FFC107;
+      --status-danger: #F44336;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+
+    header h1 {
+      color: var(--primary-color);
+      font-size: 1.8rem;
+      margin: 0;
+    }
+
+    .actions button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background-color 0.3s;
+      margin-left: 10px;
+    }
+
+    .actions button:hover {
+      background-color: #004a75;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 20px;
+    }
+    
+    #segment-list-container {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+
+    #segment-list-container h2 {
+      margin-top: 0;
+      color: var(--primary-color);
+    }
+
+    .segment-card {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      border-left: 5px solid var(--border-color);
+    }
+    
+    .segment-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .segment-card.active {
+      border-color: var(--secondary-color);
+      border-left-color: var(--secondary-color);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .segment-card h3 {
+      font-size: 1rem;
+      margin: 0 0 10px 0;
+    }
+
+    .segment-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+
+    .grass-height {
+      font-weight: bold;
+    }
+    
+    .status-safe { border-left-color: var(--status-safe); }
+    .status-warning { border-left-color: var(--status-warning); }
+    .status-danger { border-left-color: var(--status-danger); }
+
+    .color-safe { color: var(--status-safe); }
+    .color-warning { color: var(--status-warning); }
+    .color-danger { color: var(--status-danger); }
+
+    #segment-detail-container {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+
+    .detail-placeholder, .loading-placeholder {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    
+    .loading-placeholder i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      animation: spin 1.5s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .detail-section {
+      margin-bottom: 30px;
+    }
+
+    .detail-section h3 {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--secondary-color);
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .info-item {
+      background-color: var(--bg-color);
+      padding: 15px;
+      border-radius: 5px;
+    }
+    
+    .info-item .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    
+    .info-item .value {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    
+    .weather-forecast {
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      padding-bottom: 15px; /* for scrollbar */
+    }
+
+    .weather-card {
+      flex: 0 0 130px;
+      background-color: var(--bg-color);
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+    
+    .weather-card img {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 10px;
+    }
+    
+    .weather-card .time {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .weather-card .desc {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin: 5px 0;
+    }
+    
+    .weather-card .temp {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .detail-grid-2-col {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+    }
+
+    .soil-container {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 20px;
+        align-items: center;
+    }
+
+    #soilChartContainer {
+        position: relative;
+        height: 200px;
+        width: 200px;
+    }
+
+    #soil-list, #grass-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #soil-list li, #grass-list li {
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+    }
+
+    #soil-list .percentage, #grass-list .percentage {
+        font-weight: bold;
+        display: inline-block;
+        width: 50px;
+        color: var(--primary-color);
+    }
+
+    #notification-area {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+
+    #notification-area.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      #segment-list-container, #segment-detail-container {
+        height: auto;
+      }
+      .soil-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      #soilChartContainer {
+        margin: 0 auto 20px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body>
 
-    <!-- Main Container -->
-    <div class="container mx-auto p-4 md:p-8">
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-road"></i> Dashboard Rumput Tol</h1>
+      <div class="actions">
+        <button id="updateAllHeightsBtn"><i class="fas fa-ruler-vertical"></i> Update Semua Ketinggian</button>
+        <button id="fetchWeatherBtn"><i class="fas fa-cloud-sun-rain"></i> Ambil Data Cuaca</button>
+      </div>
+    </header>
 
-        <!-- Header -->
-        <header class="mb-8 text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-green-800">Dasbor Pemantauan Rumput</h1>
-            <p class="text-lg text-gray-600 mt-2">Status pertumbuhan rumput di sepanjang jalan tol secara real-time.</p>
-        </header>
-
-        <!-- Main Grid Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            <!-- Left Column: Segments List -->
-            <div class="lg:col-span-1">
-                <div class="bg-white p-6 rounded-xl shadow-md sticky top-8">
-                    <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                        Daftar Segmen
-                    </h2>
-                    <div id="segmentsCards" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                        <!-- Loading placeholder -->
-                        <p class="text-gray-500">Memuat segmen...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column: Details and Actions -->
-            <div class="lg:col-span-2 space-y-8">
-                
-                <!-- Segment Details Section -->
-                <section id="segmentDetailsSection" class="bg-white p-6 rounded-xl shadow-md hidden">
-                    <h2 class="text-2xl font-bold text-green-700 mb-4 border-b pb-3" id="detailsHeader">Detail Segmen</h2>
-                    <div id="detailsContent" class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                        <!-- Details will be injected here -->
-                    </div>
-                </section>
-
-                <!-- Actions Section -->
-                <section class="bg-white p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-green-700 mb-4">Aksi</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        <button id="fetchWeather" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all shadow-sm disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-5 w-5"><path d="M5 12c0-1.657 1.343-3 3-3s3 1.343 3 3-1.343 3-3 3-3-1.343-3-3z"></path><path d="M12 12c0-1.657 1.343-3 3-3s3 1.343 3 3-1.343 3-3 3-3-1.343-3-3z"></path><path d="M19 12c0-1.657 1.343-3 3-3s3 1.343 3 3-1.343 3-3 3-3-1.343-3-3z"></path></svg>
-                            Ambil Data Cuaca
-                        </button>
-                         <button id="fetchSoilGrass" class="w-full bg-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-700 transition-all shadow-sm disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-5 w-5"><path d="M21.5 2.5c4.2 4.2 1.2 11.3-5.5 11.3-5.6 0-10.3 3.9-12.3 8.8"></path><path d="M9.5 2.5c-4.2 4.2-1.2 11.3 5.5 11.3 5.6 0 10.3 3.9 12.3 8.8"></path><path d="M2.5 14.5c4.2-4.2 11.3-1.2 11.3 5.5C13.8 25.6 9.9 30.3 5 32.3"></path><path d="M2.5 7.5c4.2-4.2 11.3-1.2 11.3 5.5C13.8 18.6 9.9 23.3 5 25.3"></path></svg>
-                            Data Tanah & Rumput
-                        </button>
-                        <button id="updateHeight" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-all shadow-sm disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-5 w-5"><path d="M12 22V2"></path><path d="m17 7-5 5-5-5"></path><path d="m17 14-5 5-5-5"></path></svg>
-                            Perbarui Tinggi
-                        </button>
-                    </div>
-                </section>
-
-                <!-- Results Section -->
-                <section class="bg-white p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-green-700 mb-4">Hasil Proses</h2>
-                    <pre id="resultsOutput" class="bg-gray-100 text-gray-700 p-4 rounded-lg max-h-64 overflow-y-auto text-sm w-full whitespace-pre-wrap break-word">Menunggu aksi...</pre>
-                </section>
-                 <!-- Notification Toast -->
-                <div id="toast" class="fixed bottom-5 right-5 bg-red-500 text-white py-3 px-6 rounded-lg shadow-xl translate-x-[120%] transition-transform duration-300 ease-in-out">
-                    <p id="toastMessage">Pesan notifikasi.</p>
-                </div>
-
-            </div>
+    <main class="dashboard-grid">
+      <aside id="segment-list-container">
+        <h2>Daftar Segmen</h2>
+        <div id="segment-list">
+          <div class="loading-placeholder"><i class="fas fa-spinner"></i> Memuat Segmen...</div>
         </div>
-    </div>
+      </aside>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const segmentsCardsContainer = document.getElementById('segmentsCards');
-            const segmentDetailsSection = document.getElementById('segmentDetailsSection');
-            const detailsHeader = document.getElementById('detailsHeader');
-            const detailsContent = document.getElementById('detailsContent');
-            const resultsOutput = document.getElementById('resultsOutput');
-            const fetchWeatherBtn = document.getElementById('fetchWeather');
-            const fetchSoilGrassBtn = document.getElementById('fetchSoilGrass');
-            const updateHeightBtn = document.getElementById('updateHeight');
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
+      <section id="segment-detail-container">
+        <div class="detail-placeholder">
+          <i class="fas fa-arrow-left" style="font-size: 3rem; margin-bottom: 20px;"></i>
+          <h2>Pilih segmen di sebelah kiri</h2>
+          <p>Klik salah satu kartu segmen untuk melihat informasi detailnya.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <div id="notification-area"></div>
 
-            let selectedSegmentId = null;
-            let segmentsData = [];
-            
-            function showToast(message, isError = false) {
-                toastMessage.textContent = message;
-                toast.className = `fixed bottom-5 right-5 text-white py-3 px-6 rounded-lg shadow-xl translate-x-0 transition-transform duration-300 ease-in-out ${isError ? 'bg-red-500' : 'bg-green-600'}`;
-                setTimeout(() => {
-                    toast.style.transform = 'translateX(120%)';
-                }, 3000);
-            }
+  <script>
+    // --- DOM Elements ---
+    const segmentListDiv = document.getElementById('segment-list');
+    const segmentDetailContainer = document.getElementById('segment-detail-container');
+    const updateAllHeightsBtn = document.getElementById('updateAllHeightsBtn');
+    const fetchWeatherBtn = document.getElementById('fetchWeatherBtn');
+    const notificationArea = document.getElementById('notification-area');
 
-            function createSegmentCard(segment) {
-                const card = document.createElement('div');
-                card.className = 'segment-card p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all';
-                card.dataset.segmentId = segment.id;
-                card.setAttribute('tabindex', '0');
-                card.setAttribute('role', 'button');
-                
-                // Assuming height is in cm and threshold is 15cm for critical, 12cm for warning
-                const height = parseFloat(segment.estimated_height_now);
-                let statusInfo = { text: 'Aman', textColor: 'text-green-700', bgColor: 'bg-green-100' };
-                if (height >= 15) {
-                    statusInfo = { text: 'Kritis', textColor: 'text-red-700', bgColor: 'bg-red-100' };
-                } else if (height >= 12) {
-                    statusInfo = { text: 'Waspada', textColor: 'text-yellow-700', bgColor: 'bg-yellow-100' };
-                }
-                
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-lg text-gray-800 pr-2">${segment.name}</h3>
-                        <span class="text-xs font-semibold px-2 py-1 ${statusInfo.bgColor} ${statusInfo.textColor} rounded-full flex-shrink-0">${statusInfo.text}</span>
-                    </div>
-                    <div class="text-sm text-gray-600 mt-3 space-y-2">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-gray-400 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            <span>${segment.adm4}</span>
-                        </div>
-                        <div class="flex justify-between items-baseline pt-2">
-                             <p><strong>Tinggi:</strong> <span class="text-lg font-bold ${statusInfo.textColor}">${parseFloat(segment.estimated_height_now).toFixed(2)} cm</span></p>
-                             <p class="text-xs text-gray-500"><strong>3 Hari:</strong> ${parseFloat(segment.estimated_height_in_3_days).toFixed(2)} cm</p>
-                        </div>
-                    </div>
-                `;
+    let allSegmentsData = [];
+    let soilChartInstance = null;
+    
+    // --- UTILITY FUNCTIONS ---
+    
+    function getStatusByHeight(height) {
+      const h = parseFloat(height);
+      if (h >= 0.15) return { class: 'status-danger', colorClass: 'color-danger', label: 'Perlu Pemotongan' };
+      if (h >= 0.10) return { class: 'status-warning', colorClass: 'color-warning', label: 'Perlu Perhatian' };
+      return { class: 'status-safe', colorClass: 'color-safe', label: 'Aman' };
+    }
 
-                card.addEventListener('click', () => selectSegment(segment.id));
-                card.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        selectSegment(segment.id);
-                    }
-                });
-                
-                return card;
-            }
+    function formatReadableDate(dateString) {
+      if (!dateString) return 'N/A';
+      return new Date(dateString).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
 
-            function selectSegment(segmentId) {
-                selectedSegmentId = segmentId;
-                
-                document.querySelectorAll('.segment-card').forEach(c => {
-                    c.classList.remove('selected-card');
-                    if (c.dataset.segmentId == segmentId) {
-                        c.classList.add('selected-card');
-                    }
-                });
+    function showNotification(message, isError = false) {
+      notificationArea.textContent = message;
+      notificationArea.style.backgroundColor = isError ? 'var(--status-danger)' : '#333';
+      notificationArea.classList.add('show');
+      setTimeout(() => notificationArea.classList.remove('show'), 5000);
+    }
 
-                const segment = segmentsData.find(s => s.id === segmentId);
-                if (segment) {
-                    detailsHeader.textContent = `Detail: ${segment.name}`;
-                    const lastUpdated = new Date(segment.last_updated_calculation_date).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short'});
-                    detailsContent.innerHTML = `
-                        <div><p class="font-semibold text-gray-700">Tinggi Rata-rata Saat Ini</p><p class="text-2xl font-bold text-green-600">${parseFloat(segment.estimated_height_now).toFixed(2)} cm</p></div>
-                        <div><p class="font-semibold text-gray-700">Prediksi Tinggi (3 Hari)</p><p class="text-2xl font-bold text-blue-600">${parseFloat(segment.estimated_height_in_3_days).toFixed(2)} cm</p></div>
-                        <div><p class="font-semibold text-gray-700">Panjang Segmen</p><p>${(segment.panjang / 1000).toFixed(2)} km</p></div>
-                        <div><p class="font-semibold text-gray-700">Elevasi Rata-rata</p><p>${parseFloat(segment.avg_elevation).toFixed(2)} m</p></div>
-                        <div><p class="font-semibold text-gray-700">Wilayah Administrasi</p><p>${segment.adm4}</p></div>
-                        <div><p class="font-semibold text-gray-700">Pembaruan Terakhir</p><p>${lastUpdated}</p></div>
-                    `;
-                    segmentDetailsSection.classList.remove('hidden');
-                }
-                
-                [fetchWeatherBtn, fetchSoilGrassBtn, updateHeightBtn].forEach(btn => btn.disabled = false);
-                resultsOutput.textContent = `Segmen ${segment.name} dipilih. Silakan pilih aksi.`;
-            }
-
-            async function loadSegments() {
-                segmentsCardsContainer.innerHTML = '<p class="text-gray-500">Memuat segmen...</p>';
-                try {
-                    // This fetch will likely fail if you just open the HTML file. 
-                    // The 'catch' block will then use the mock data.
-                    const res = await fetch('/api/segments');
-                    if (!res.ok) throw new Error(`Gagal memuat segmen: ${res.statusText}`);
-                    segmentsData = await res.json();
-                    
-                    segmentsCardsContainer.innerHTML = ''; 
-                    if (!segmentsData || segmentsData.length === 0) {
-                         segmentsCardsContainer.innerHTML = '<p class="text-red-500">Tidak ada segmen yang ditemukan.</p>';
-                         return;
-                    }
-                    segmentsData.forEach(seg => {
-                        const card = createSegmentCard(seg);
-                        segmentsCardsContainer.appendChild(card);
-                    });
-                } catch (err) {
-                     // Fallback to mock data on error for demonstration
-                    console.error("Fetch error, falling back to mock data:", err);
-                    segmentsData = [
-                         { "id": 1, "name": "Seksi I: Cikopo?Kalijati (Km 0+000?29+120)", "panjang": 29120, "titik_tengah": "-6.497,107.585", "km_start": 0, "km_end": 29, "avg_elevation": "105.00", "estimated_height_now": "10.50", "estimated_height_in_3_days": "10.50", "last_updated_calculation_date": "2025-06-11T01:27:19.000Z", "adm4": "Cipeundeuy, Cipeundeuy" },
-                         { "id": 2, "name": "Seksi II: Kalijati?Subang (Km 29+120?38+680)", "panjang": 9560, "titik_tengah": "-6.541,107.725", "km_start": 29, "km_end": 38, "avg_elevation": "95.00", "estimated_height_now": "12.20", "estimated_height_in_3_days": "13.20", "last_updated_calculation_date": "2025-06-11T15:48:53.000Z", "adm4": "Sukasari, Dawuan" },
-                         { "id": 3, "name": "Seksi III: Subang?Cikedung (Km 38+680?70+050)", "panjang": 31370, "titik_tengah": "-6.562,107.925", "km_start": 38, "km_end": 70, "avg_elevation": "55.00", "estimated_height_now": "9.80", "estimated_height_in_3_days": "10.00", "last_updated_calculation_date": "2025-06-11T01:27:19.000Z", "adm4": "Bantarwaru, Gantar" },
-                         { "id": 4, "name": "Seksi IV: Cikedung?Kertajati (Km 70+050?87+710)", "panjang": 17660, "titik_tengah": "-6.609,108.130", "km_start": 70, "km_end": 87, "avg_elevation": "22.50", "estimated_height_now": "15.30", "estimated_height_in_3_days": "16.50", "last_updated_calculation_date": "2025-06-11T01:27:19.000Z", "adm4": "Mekarjaya, Kertajati" },
-                         { "id": 5, "name": "Seksi V: Kertajati?Sumberjaya (Km 87+710?102+260)", "panjang": 14510, "titik_tengah": "-6.685,108.244", "km_start": 87, "km_end": 102, "avg_elevation": "38.00", "estimated_height_now": "11.70", "estimated_height_in_3_days": "11.70", "last_updated_calculation_date": "2025-06-11T01:27:19.000Z", "adm4": "Jatiwangi, Jatiwangi" },
-                         { "id": 6, "name": "Seksi VI: Sumberjaya?Palimanan (Km 102+260?116+790)", "panjang": 14530, "titik_tengah": "-6.706,108.373", "km_start": 102, "km_end": 116, "avg_elevation": "25.00", "estimated_height_now": "14.00", "estimated_height_in_3_days": "15.26", "last_updated_calculation_date": "2025-06-11T15:45:11.000Z", "adm4": "walahar, gempol" }
-                    ];
-                    segmentsCardsContainer.innerHTML = '';
-                    segmentsData.forEach(seg => segmentsCardsContainer.appendChild(createSegmentCard(seg)));
-                    showToast('Gagal memuat data live, menampilkan data contoh.', true);
-                } finally {
-                    [fetchWeatherBtn, fetchSoilGrassBtn, updateHeightBtn].forEach(btn => btn.disabled = true);
-                }
-            }
-
-            async function handleApiCall(button, url, options, successMessage) {
-                if (!selectedSegmentId) {
-                    showToast('Silakan pilih segmen terlebih dahulu.', true);
-                    return;
-                }
-                const originalText = button.innerHTML;
-                button.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>';
-                button.disabled = true;
-                resultsOutput.textContent = `Memproses: ${successMessage}...`;
-
-                try {
-                    const res = await fetch(url, options);
-                    if (!res.ok) throw new Error(`Respons jaringan tidak baik: ${res.status}`);
-                    const data = await res.json();
-                    
-                    let formattedText;
-                    if (button.id === 'fetchSoilGrass') {
-                         formattedText = "Komposisi Tanah & Rumput:\n--------------------------\n";
-                         if(data && data.length > 0) {
-                            data.forEach(item => {
-                                formattedText += `- ${item.grass_name} (${item.soil_name}): ${item.percentage}%\n`;
-                            });
-                         } else {
-                            formattedText = "Tidak ada data tanah & rumput untuk segmen ini.";
-                         }
-                    } else {
-                        formattedText = JSON.stringify(data, null, 2);
-                    }
-                    resultsOutput.textContent = formattedText;
-                    showToast(successMessage);
-
-                } catch (err) {
-                    console.error("API call error:", err);
-                    resultsOutput.textContent = `Error: ${err.message}. \n\nMenampilkan data contoh sebagai fallback.`;
-                    // Mocking API call for demonstration on failure
-                    if (button.id === 'fetchSoilGrass') {
-                        const mockSoilData = [
-                            { "soil_id": 1, "percentage": 35, "soil_name": "Latosol", "grass_name": "Zoysia matrella" },
-                            { "soil_id": 2, "percentage": 25, "soil_name": "Podsolik Merah", "grass_name": "Axonopus compressus" },
-                            { "soil_id": 3, "percentage": 20, "soil_name": "Grumosol", "grass_name": "Vetiveria zizanioides" }
-                        ];
-                        let formattedText = "Komposisi Tanah & Rumput (Data Contoh):\n--------------------------\n";
-                        mockSoilData.forEach(item => {
-                            formattedText += `- ${item.grass_name} (${item.soil_name}): ${item.percentage}%\n`;
-                        });
-                        resultsOutput.textContent = formattedText;
-                    } else if (button.id === 'fetchWeather') {
-                         resultsOutput.textContent = JSON.stringify({ message: "Data cuaca untuk segmen " + selectedSegmentId + " berhasil diambil (Data Contoh).", weather: { temp: 28, condition: "Cerah Berawan", humidity: "75%" }}, null, 2);
-                    } else if (button.id === 'updateHeight') {
-                         resultsOutput.textContent = JSON.stringify({ message: "Perhitungan ulang tinggi rumput berhasil (Data Contoh).", new_height: (Math.random() * 2 + 12).toFixed(2) + " cm" }, null, 2);
-                         // Reload segments to show updated height
-                         setTimeout(loadSegments, 1000);
-                    }
-                    showToast(`Gagal memuat data live. Menampilkan data contoh.`, true);
-                } finally {
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                }
-            }
-
-            fetchWeatherBtn.addEventListener('click', () => handleApiCall(fetchWeatherBtn, `/api/segments/${selectedSegmentId}/weather`, { method: 'GET' }, 'Data cuaca berhasil diambil'));
-            fetchSoilGrassBtn.addEventListener('click', () => handleApiCall(fetchSoilGrassBtn, `/api/segments/${selectedSegmentId}/soil-grass`, { method: 'GET' }, 'Data tanah & rumput berhasil diambil'));
-            updateHeightBtn.addEventListener('click', () => handleApiCall(updateHeightBtn, `/api/segment/height`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ segmentId: selectedSegmentId }) }, 'Tinggi rumput berhasil diperbarui'));
-
-            loadSegments();
+    // --- RENDER FUNCTIONS ---
+    
+    function renderSegmentList(segments) {
+      segmentListDiv.innerHTML = '';
+      if (!segments || segments.length === 0) {
+        segmentListDiv.innerHTML = '<p>Tidak ada data segmen yang ditemukan.</p>';
+        return;
+      }
+      
+      segments.forEach(seg => {
+        const status = getStatusByHeight(seg.estimated_height_now);
+        const card = document.createElement('div');
+        card.className = `segment-card ${status.class}`;
+        card.dataset.id = seg.id;
+        
+        card.innerHTML = `<h3>${seg.name}</h3><div class="segment-info"><span>Status: <strong class="${status.colorClass}">${status.label}</strong></span><span class="grass-height"><i class="fas fa-ruler"></i> ${(seg.estimated_height_now * 100).toFixed(1)} cm</span></div>`;
+        
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.segment-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          showSegmentDetails(seg.id);
         });
-    </script>
+        
+        segmentListDiv.appendChild(card);
+      });
+    }
+
+    async function showSegmentDetails(segmentId) {
+      segmentDetailContainer.innerHTML = `<div class="loading-placeholder"><i class="fas fa-spinner"></i><h2>Memuat Detail Segmen...</h2></div>`;
+
+      try {
+        const segmentData = allSegmentsData.find(s => s.id == segmentId);
+        
+        const [weatherRes, soilGrassRes] = await Promise.all([
+          fetch(`/api/segments/${segmentId}/weather`),
+          fetch(`/api/segments/${segmentId}/soil-grass`)
+        ]);
+
+        if (!weatherRes.ok || !soilGrassRes.ok) throw new Error('Gagal mengambil data detail segmen.');
+
+        const weatherData = await weatherRes.json();
+        const soilGrassData = await soilGrassRes.json();
+        
+        renderDetailContent(segmentData, weatherData, soilGrassData);
+        
+      } catch (error) {
+        console.error('Error fetching segment details:', error);
+        segmentDetailContainer.innerHTML = `<div class="detail-placeholder"><i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--status-danger)"></i><h2>Gagal Memuat Data</h2><p>Terjadi kesalahan saat mengambil data. Silakan coba lagi.</p></div>`;
+      }
+    }
+
+    // --- KUNCI PERUBAHAN ADA DI FUNGSI INI ---
+    // Sekarang `soilGrass` adalah objek { soils: [], grasses: [] }
+    function renderDetailContent(segment, weather, soilGrass) {
+        const status = getStatusByHeight(segment.estimated_height_now);
+        
+        segmentDetailContainer.innerHTML = `
+          <h2>Detail Segmen: ${segment.name}</h2>
+          
+          <section class="detail-section">
+            <h3><i class="fas fa-info-circle"></i> Informasi Umum</h3>
+            <div class="info-grid">
+              <div class="info-item"><div class="label">Status Saat Ini</div><div class="value ${status.colorClass}">${status.label}</div></div>
+              <div class="info-item"><div class="label">Tinggi Rumput</div><div class="value">${(segment.estimated_height_now * 100).toFixed(1)} cm</div></div>
+              <div class="info-item"><div class="label">Estimasi Tinggi (3 Hari)</div><div class="value">${(segment.estimated_height_in_3_days * 100).toFixed(1)} cm</div></div>
+              <div class="info-item"><div class="label">Panjang Segmen</div><div class="value">${(segment.panjang / 1000).toFixed(2)} km</div></div>
+              <div class="info-item"><div class="label">Lokasi</div><div class="value">${segment.adm4}</div></div>
+              <div class="info-item"><div class="label">Update Terakhir</div><div class="value">${formatReadableDate(segment.last_updated_calculation_date)}</div></div>
+            </div>
+          </section>
+
+          <section class="detail-section">
+            <h3><i class="fas fa-cloud"></i> Ramalan Cuaca (3 Hari)</h3>
+            <div class="weather-forecast">${generateWeatherHTML(weather)}</div>
+          </section>
+          
+          <div class="detail-grid-2-col">
+              <section class="detail-section">
+                <h3><i class="fas fa-mountain"></i> Komposisi Tanah</h3>
+                <div class="soil-container">
+                  <div id="soilChartContainer"><canvas id="soilChart"></canvas></div>
+                  <div id="soil-legend">${generateSoilLegendHTML(soilGrass.soils)}</div>
+                </div>
+              </section>
+
+              <section class="detail-section">
+                <h3><i class="fas fa-seedling"></i> Jenis Rumput Dominan</h3>
+                <div id="grass-list-container">${generateGrassListHTML(soilGrass.grasses)}</div>
+              </section>
+          </div>
+        `;
+        
+        // Kirim hanya data tanah ke fungsi chart
+        renderSoilChart(soilGrass.soils);
+    }
+    
+    function generateWeatherHTML(weatherData) {
+        let html = '';
+        const allForecasts = weatherData?.jsons?.data?.[0]?.cuaca?.flat()?.slice(0, 24) || [];
+        if (allForecasts.length === 0) return '<p>Data cuaca tidak tersedia.</p>';
+
+        allForecasts.forEach(forecast => {
+            const time = new Date(forecast.local_datetime);
+            html += `<div class="weather-card"><div class="time">${time.toLocaleDateString('id-ID', {weekday: 'short'})}, ${time.getHours()}:00</div><img src="${forecast.image}" alt="${forecast.weather_desc}"><div class="desc">${forecast.weather_desc}</div><div class="temp">${forecast.t}°C</div><div class="details" style="font-size:0.8rem; color: var(--text-muted)"><span><i class="fas fa-tint"></i> ${forecast.hu}%</span><span style="margin-left:5px;"><i class="fas fa-wind"></i> ${forecast.ws} m/s</span></div></div>`;
+        });
+        return html;
+    }
+
+    function generateSoilLegendHTML(soils) {
+        if (!soils || soils.length === 0) return '<p>Data tanah tidak tersedia.</p>';
+        let html = '<ul id="soil-list">';
+        [...soils].sort((a, b) => b.percentage - a.percentage).forEach(item => {
+            html += `<li><span class="percentage">${item.percentage}%</span><strong>${item.soil_name}</strong></li>`;
+        });
+        return html + '</ul>';
+    }
+
+    function generateGrassListHTML(grasses) {
+        if (!grasses || grasses.length === 0) return '<p>Data jenis rumput tidak tersedia.</p>';
+        let html = '<ul id="grass-list">';
+        [...grasses].sort((a, b) => b.percentage - a.percentage).forEach(item => {
+            html += `<li><span class="percentage">${item.percentage}%</span><span>${item.grass_name}</span></li>`;
+        });
+        return html + '</ul>';
+    }
+
+    function renderSoilChart(soils) {
+      const ctx = document.getElementById('soilChart')?.getContext('2d');
+      if (!ctx || !soils || soils.length === 0) return;
+
+      if (soilChartInstance) soilChartInstance.destroy();
+
+      const labels = soils.map(item => item.soil_name);
+      const data = soils.map(item => item.percentage);
+      const backgroundColors = ['#4CAF50','#8BC34A','#CDDC39','#FFEB3B','#FFC107','#FF9800','#a1887f','#795548','#5d4037','#bcaaa4'];
+      const cardBgColor = getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim();
+
+      soilChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{ data: data, backgroundColor: backgroundColors, borderColor: cardBgColor, borderWidth: 3 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (context) => `${context.label}: ${context.parsed}%` }}
+          }
+        }
+      });
+    }
+
+    // --- EVENT LISTENERS for global actions ---
+    
+    updateAllHeightsBtn.addEventListener('click', async () => {
+      showNotification('Memperbarui ketinggian rumput...', false);
+      try {
+        const res = await fetch('/api/segment/height', { method: 'POST' });
+        const result = await res.json();
+        let message = result.message;
+        if (result.nextAllowed) message += ` Coba lagi setelah: ${formatReadableDate(result.nextAllowed)}`;
+        showNotification(message, !res.ok);
+        if (res.ok) loadAllSegments();
+      } catch (error) { showNotification('Gagal terhubung ke server.', true); }
+    });
+    
+    fetchWeatherBtn.addEventListener('click', async () => {
+      showNotification('Mengambil data cuaca...', false);
+      try {
+        const res = await fetch('/api/weather', { method: 'POST' });
+        const result = await res.json();
+        const skippedCount = result.result?.filter(r => r.skipped).length || 0;
+        const totalCount = result.result?.length || 0;
+        let message = `${result.message}. ${totalCount - skippedCount} segmen diperbarui, ${skippedCount} dilewati.`;
+        showNotification(message, !res.ok);
+      } catch (error) { showNotification('Gagal terhubung ke server.', true); }
+    });
+
+    // --- INITIAL LOAD ---
+    
+    async function loadAllSegments() {
+      try {
+        const res = await fetch('/api/segments');
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        allSegmentsData = await res.json();
+        renderSegmentList(allSegmentsData);
+      } catch (error) {
+        console.error("Failed to load segments:", error);
+        segmentListDiv.innerHTML = `<p style="color: var(--status-danger);">Gagal memuat data segmen. Periksa koneksi ke server.</p>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAllSegments);
+
+  </script>
 </body>
 </html>

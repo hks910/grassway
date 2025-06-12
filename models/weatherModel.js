@@ -1,4 +1,6 @@
 const db = require('./db');
+const axios = require('axios');
+
 
 // Get all segments
 const getAllSegment = async () => {
@@ -35,18 +37,31 @@ const getSegmentWeatherData = async (segmentId) => {
 // Get soil and grass data for a segment
 const getSegmentSoilAndGrassData = async (segmentId) => {
   try {
-    const [results] = await db.query(`
-      SELECT ss.soil_id, ss.percentage, s.soil_name, g.grass_name
+    // Get soil data
+    const [soilResults] = await db.query(`
+      SELECT ss.soil_id, ss.percentage, s.soil_name
       FROM soil_segment ss
       JOIN soil s ON ss.soil_id = s.id
-      JOIN grass g ON ss.soil_id = g.id
       WHERE ss.segment_id = ?;
     `, [segmentId]);
-    return results;
+
+    // Get grass data
+    const [grassResults] = await db.query(`
+      SELECT sg.grass_id, sg.percentage, g.grass_name
+      FROM segment_grass sg
+      JOIN grass g ON sg.grass_id = g.id
+      WHERE sg.segment_id = ?;
+    `, [segmentId]);
+
+    return {
+      soils: soilResults,
+      grasses: grassResults
+    };
   } catch (err) {
     throw err;
   }
 };
+
 
 // Update estimated height of a segment
 const updateSegmentHeight = async (segmentId, estimatedHeightNow, estimatedHeightIn3Days) => {
@@ -76,10 +91,22 @@ const addWeatherData = async (segmentId, jsonData) => {
   }
 };
 
+async function getSegmentById(segmentId) {
+  const [rows] = await db.query(
+    `SELECT id, adm4Code, avg_elevation, max_elevation, min_elevation, estimated_height_now, estimated_height_in_3_days
+     FROM segment
+     WHERE id = ?`,
+    [segmentId]
+  );
+  if (rows.length === 0) return null;
+  return rows[0];
+}
+
 module.exports = {
   getAllSegment,
   getSegmentWeatherData,
   getSegmentSoilAndGrassData,
   addWeatherData,
-  updateSegmentHeight
+  updateSegmentHeight,
+  getSegmentById
 };

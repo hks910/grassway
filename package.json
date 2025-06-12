@@ -12,6 +12,7 @@
     "ejs": "^3.x.x",
     "express": "^4.x.x",
     "mysql2": "^2.x.x",
+    "node-cron": "^4.1.0",
     "sequelize": "^6.x.x"
   }
 }

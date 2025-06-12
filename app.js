@@ -22,6 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/', webRoutes);
+app.use('/api/segments', webRoutes);
 
 // Cek koneksi DB sebelum listen
 (async () => {
@@ -36,4 +37,7 @@ app.use('/', webRoutes);
     console.error('❌ DB connection failed:', err.message);
     process.exit(1);
   }
+
+  require('./scheduler');
+
 })();

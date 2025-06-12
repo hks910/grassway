@@ -19,11 +19,13 @@ router.get('/', async (req, res) => {
 
 
 // API endpoints
+router.get('/:segmentId', weatherController.getSegment);
 router.get('/api/segments', weatherController.getAllSegment);
 router.get('/api/segments/:segmentId/weather', weatherController.getWeatherData);
 router.get('/api/segments/:segmentId/soil-grass', weatherController.getSoilAndGrassData);
 router.post('/api/weather', weatherController.addWeather);
-router.post('/api/segment/height', segmentController.updateSegmentHeight);
+router.post('/api/segment/height', segmentController.updateAllSegmentHeights);
+
 
 
 

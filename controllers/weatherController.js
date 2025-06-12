@@ -1,6 +1,7 @@
 // controllers/weatherController.js
 const weatherModel = require('../models/weatherModel');
 const db = require('../models/db');
+const axios = require('axios');
 
 
 
@@ -27,51 +28,72 @@ const getWeatherData = async (req, res) => {
 };
 
 
-// Controller function to get soil and grass data for a segment
 const getSoilAndGrassData = async (req, res) => {
-    const { segmentId } = req.params;
-    try {
-        const soilAndGrassData = await weatherModel.getSegmentSoilAndGrassData(segmentId);
-        res.json(soilAndGrassData);
-    } catch (err) {
-        res.status(500).json({ message: "Error retrieving soil and grass data", error: err });
-    }
+  const { segmentId } = req.params;
+  try {
+    const data = await weatherModel.getSegmentSoilAndGrassData(segmentId);
+    res.json({
+      segmentId,
+      soils: data.soils,
+      grasses: data.grasses
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Error retrieving soil and grass data",
+      error: err.message
+    });
+  }
 };
 
+
 // Function to insert weather data
-const axios = require('axios');
 
 
-const addWeather = async (req, res) => {
+  const addWeather = async (req, res) => {
   try {
-    // Step 1: Get all segment IDs and adm4Codes
     const [segments] = await db.query('SELECT id, adm4Code FROM segment');
-
     if (segments.length === 0) {
       return res.status(404).json({ message: 'No segments found' });
     }
 
     const insertedWeather = [];
 
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
     for (const segment of segments) {
-      const { segment_id, adm4Code } = segment;
+      const segmentId = segment.id;
+      const adm4Code = segment.adm4Code;
+
+      // Cek apakah sudah ada data hari ini
+      const [existing] = await db.query(`
+        SELECT id FROM weathers
+        WHERE segment_id = ? AND DATE(insert_time) = ?
+        LIMIT 1
+      `, [segmentId, today]);
+
+      if (existing.length > 0) {
+        insertedWeather.push({
+          segmentId,
+          skipped: true,
+          reason: 'Already updated today'
+        });
+        continue;
+      }
 
       try {
-        // Step 2: Fetch weather data from BMKG using adm4Code
         const response = await axios.get(`https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${adm4Code}`);
         const weatherData = response.data;
 
-        // Step 3: Insert weather data into the database
-        const newWeatherId = await weatherModel.addWeatherData(segment_id, weatherData);
+        const newWeatherId = await weatherModel.addWeatherData(segmentId, weatherData);
+        insertedWeather.push({ segmentId, inserted: true, id: newWeatherId });
 
-        insertedWeather.push({ segmentId: segment_id, id: newWeatherId });
       } catch (err) {
-        console.error(`Error fetching/inserting for segment ${segment_id}:`, err.message);
-        insertedWeather.push({ segmentId: segment_id, error: err.message });
+        insertedWeather.push({ segmentId, error: err.message });
       }
     }
 
-    res.status(201).json({ message: 'Weather data processed', result: insertedWeather });
+    res.status(201).json({ message: 'Weather update attempted', result: insertedWeather });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -97,6 +119,24 @@ const updateSegmentHeight = async (req, res) => {
   }
 };
 
+async function getSegment(req, res) {
+  const segmentId = req.params.segmentId;
+
+  if (!segmentId) {
+    return res.status(400).json({ message: 'segmentId is required' });
+  }
+
+  try {
+    const segment = await weatherModel.getSegmentById(segmentId);
+    if (!segment) {
+      return res.status(404).json({ message: 'Segment not found' });
+    }
+    res.json(segment);
+  } catch (error) {
+    console.error('Error fetching segment:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
 
 
 
@@ -105,5 +145,6 @@ module.exports = {
     getWeatherData,
     getSoilAndGrassData,
     addWeather,
-    updateSegmentHeight
+    updateSegmentHeight,
+    getSegment
 };
