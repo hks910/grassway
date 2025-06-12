@@ -1,5 +1,9 @@
 # 🦗 Grass-Way: Smart Grass Growth API
 
+![image](https://github.com/user-attachments/assets/42de52be-e54e-42e4-bbb0-7df5153bfaf8)
+![image](https://github.com/user-attachments/assets/1def3b5c-01b0-42f7-8d45-cc0dcdfe22bf)
+
+
 [![Lisensi: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node.js-v16.x-green.svg)](https://nodejs.org/en/)
 [![Kontribusi Welcome](https://img.shields.io/badge/Contributions-welcome-brightgreen.svg?style=flat)](./CONTRIBUTING.md)
