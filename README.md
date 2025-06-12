@@ -61,8 +61,7 @@ Selain API, proyek ini juga menyediakan antarmuka web sederhana untuk visualisas
     DB_PASSWORD= <Mohon Email ke hardikusuma999@gmail.com/ whatsApp 082111156935>
     DB_NAME=grassway
 
-    # Konfigurasi Server
-    PORT=3000
+
     ```
 
 4.  **Jalankan Aplikasi**
