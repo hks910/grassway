@@ -41,7 +41,7 @@ Selain API, proyek ini juga menyediakan antarmuka web sederhana untuk visualisas
 
 1.  **Clone Repositori**
     ```bash
-    git clone https://github.com/yourusername/grass-way.git
+    git clone https://github.com/hks910/grassway
     cd grass-way
     ```
 
