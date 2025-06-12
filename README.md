@@ -21,7 +21,7 @@ Selain API, proyek ini juga menyediakan antarmuka web sederhana untuk visualisas
 -   **☁️ Cloud-Ready**: Didesain untuk berjalan dengan database terkelola seperti Aiven for MySQL, lengkap dengan konfigurasi SSL.
 -   **🏗️ Arsitektur Modular**: Struktur kode yang rapi (Controllers, Models, Routes, Services) untuk skalabilitas dan kemudahan pemeliharaan.
 
-## 🛠️ Tumpukan Teknologi (Tech Stack)
+## 🛠️ Tech Stack
 
 -   **Backend**: Node.js, Express.js
 -   **Database**: Aiven for MySQL (atau MySQL standar)
