@@ -50,7 +50,7 @@ Selain API, proyek ini juga menyediakan antarmuka web sederhana untuk visualisas
 
     **Contoh untuk Aiven for MySQL:**
     ```env
-    # Konfigurasi Aiven for MySQL (Ganti dengan kredensial Anda yang BARU)
+
     DB_HOST= mysql-f245633-hardikusuma999-bb49.f.aivencloud.com
     DB_USER= yavnadmin
     DB_PASSWORD= <Mohon Email ke hardikusuma999@gmail.com/ whatsApp 082111156935>
