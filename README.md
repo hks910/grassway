@@ -51,7 +51,7 @@ Selain API, proyek ini juga menyediakan antarmuka web sederhana untuk visualisas
     ```
 
 3.  **Konfigurasi Variabel Lingkungan**
-    Buat file `.env` di direktori utama dan isi dengan konfigurasi Anda. **JANGAN PERNAH MENGUNGGAH FILE .env KE GITHUB.**
+    Buat file `.env` di direktori utama dan isi dengan konfigurasi Anda.
 
     **Contoh untuk Aiven for MySQL:**
     ```env
